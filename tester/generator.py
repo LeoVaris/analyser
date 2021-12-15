@@ -1,31 +1,28 @@
 import sys
 
+from itertools import permutations
+
 from run_test import run_test
 
 def fail_args():
     print("Missing arguments")
-    print("python3 main.py [n] [m] [output] [model solution]")
+    print("python3 generator.py [n] [m] [output] [model solution]")
     sys.exit(-1)
 
-permutations = []
+perms = []
 current = []
 
-def run(idx, n, m):
-    if idx == n:
-        permutations.append(current[:])
-        return
-
-    for num in range(1, m + 1):
-        current[idx] = num
-        run(idx + 1, n, m)
+def run(n):
+    global perms
+    perms = list(permutations(range(1, n + 1)))
 
 def form_tests(model):
     tests = []
 
-    for p in permutations:
+    for p in perms:
         test_str = f"{len(p)}\n" # add first line that contains n.
 
-        for x in p:
+        for x in list(p):
             test_str += str(x) + " "
 
         solution = int(run_test(model, test_str))
@@ -55,7 +52,7 @@ if __name__ == "__main__":
 
     current = [0] * n
 
-    run(0, n, m)
+    run(n)
 
     tests = form_tests(model)
 

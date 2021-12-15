@@ -5,17 +5,16 @@ from run_test import run_test
 
 def fail_args():
     print("Missing arguments")
-    print("python3 main.py [n] [max] [count] [output] [model solution]")
+    print("python3 random_generator.py [n] [max] [count] [output] [model solution]")
     sys.exit(-1)
 
 permutations = []
 
-def run(n, m, cnt):
+def run(n, cnt):
+    lst = list(range(1, n + 1))
     for _ in range(cnt):
-        lst = []
-        for _ in range(n):
-            lst.append(random.randint(1, m))
-        permutations.append(lst)
+        random.shuffle(lst)
+        permutations.append(lst[:])
 
 def form_tests(model):
     tests = []
@@ -52,7 +51,7 @@ if __name__ == "__main__":
     output = args[4]
     model = args[5]
 
-    run(n, m, cnt)
+    run(n, cnt)
 
     tests = form_tests(model)
 

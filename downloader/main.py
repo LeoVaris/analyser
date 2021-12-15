@@ -4,9 +4,11 @@ from util import get_hashes
 
 
 if __name__ == "__main__":
-    hashes = get_hashes("./data/dump-1748.txt")
+    hashes = get_hashes("./data/dump-2216.txt")
+
+    print("Downloading", len(hashes), "hashes")
 
     for hash in hashes:
-        download(f"https://cses.fi/file/{hash}/1/1/", f"./codes/1748/{hash}.cpp")
+        download(f"https://cses.fi/file/{hash}/1/1/", f"./codes/2216/{hash}.cpp")
         print("Downloaded", hash)
         sleep(0.01)

@@ -2,6 +2,8 @@ from os import listdir, system
 from os.path import isfile, join, abspath
 from subprocess import run, PIPE, DEVNULL, TimeoutExpired
 from joblib import Parallel, delayed
+import multiprocessing as mp
+import tqdm
 
 def run_test(file: str, input: str) -> str:
     try:
@@ -47,12 +49,36 @@ def test_folder(folder: str, tests_folder: str, result_file: str) -> None:
 
     print("Testing", len(compiled), "files with", len(tests), "tests.")
 
-    results = [[1] * len(tests) for _ in range(len(compiled))]
+    #results = [[1] * len(tests) for _ in range(len(compiled))]
 
     increment = 0.01
     target_percent = increment
     
+    def execute(file_idx, file):
+        #global target_percent
+        #if file_idx / len(compiled) >= target_percent:
+        #    print(f"{round(file_idx / len(compiled) * 100, 2)}%")
+        #    target_percent += increment
+        result_lst = [1] * len(tests)
+        for test_idx, (id, input, ans) in enumerate(tests):
+            out = run_test(file, input)
+            try:
+                out_as_int = int(out)
+                if ans == out_as_int:
+                    result_lst[test_idx] = 0
+            except ValueError:
+                pass
+        return result_lst
 
+    #results = []
+    #pool = mp.Pool(processes=2)
+
+    #for result in tqdm.tqdm(pool.imap_unordered(execute, compiled), total=len(compiled)):
+    #    results.append(result)
+
+    results = Parallel(n_jobs=5)(delayed(execute)(file_idx, file) for file_idx, file in tqdm.tqdm(list(enumerate(compiled))))
+
+    """
     for file_idx, file in enumerate(compiled):
         if file_idx / len(compiled) >= target_percent:
             print(f"{round(file_idx / len(compiled) * 100, 2)}%")
@@ -65,6 +91,7 @@ def test_folder(folder: str, tests_folder: str, result_file: str) -> None:
                     results[file_idx][test_idx] = 0
             except:
                 pass
+    """
 
     with open(result_file, "w") as f:
         f.write(";".join([id for id, _, _ in tests]) + "\n")
